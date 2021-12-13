@@ -100,7 +100,8 @@ void main(void)
 __interrupt void Port_1(void)       // interrupt program
 {
   
-  if (P1IFG & BIT1 ) // hand wash sensor
+  if (P1IFG & BIT1 )
+    {// hand wash sensor
     __delay_cycles(50000);
   if (P1IN & BIT1) {}
   else
@@ -124,19 +125,17 @@ __interrupt void Port_1(void)       // interrupt program
       }
       
     }
-    display(wash_time,time_flow,cur_person); /
+    display(wash_time,time_flow,cur_person); 
       
   }
-}
-
-
+    }
   else if (P1IFG &BIT2 ) //reduce spray time
   {	
     
     P1IFG &= ~BIT2;  
     
     P1OUT |= BIT6;
-    __delay_cycles(10000);
+    __delay_cycles(100000);
     P1OUT &= ~BIT6;
     
     time_flow --;
@@ -149,7 +148,7 @@ __interrupt void Port_1(void)       // interrupt program
     
     P1IFG &= ~BIT3;   
     P1OUT |= BIT6;
-    __delay_cycles(10000);
+    __delay_cycles(100000);
     P1OUT &= ~BIT6;
     
     time_flow ++;
