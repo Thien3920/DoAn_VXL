@@ -1,4 +1,3 @@
-// Dev: Cuong Tran
 // 12/12/2021
 // Interface LCD1602 with MSP430G2553
 
