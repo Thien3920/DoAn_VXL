@@ -1,3 +1,4 @@
+// Dev: Le Van Thien
 #include <msp430g2553.h>
 #include "lcd.c"
 
