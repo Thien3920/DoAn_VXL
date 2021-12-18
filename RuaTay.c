@@ -1,4 +1,4 @@
-// Dev: Le Van Thien
+//Dev: le Van Thien
 #include <msp430g2553.h>
 #include "lcd.c"
 
@@ -49,8 +49,11 @@ void main(void)
   P1OUT &=~BIT6;  
   
   /*P1.7 INPUT  FOR RESET WASH_TIME=0 (OUT OF WATER) */
-  P1DIR |= BIT7;
-  P1OUT &=~BIT7;  
+  P1DIR &= ~BIT7; 	 // p1.1 : input
+  P1REN |=BIT7;   	 // Pullup/pulldown resistor enabled
+  P1OUT &= ~BIT7; 	 // enable internal pull down
+  P1IE  |=BIT7;  	  // enable interrupt p1.1
+  P1IES &=~BIT7;  	 //(low-to-high)  
   
   /* P1.1 : proximity sensor */
   P1DIR &= ~BIT1; 	 // p1.1 : input
@@ -102,34 +105,34 @@ __interrupt void Port_1(void)       // interrupt program
 {
   
   if (P1IFG & BIT1 )
-    {// hand wash sensor
+  {// hand wash sensor
     __delay_cycles(50000);
-  if (P1IN & BIT1) {}
-  else
-  {
-    P1OUT |= BIT0;
-    delay_(time_flow);  
-    P1OUT &= ~BIT0;
-    P1IFG &= ~BIT1;   // clear interrupt flag
-    
-    wash_time = wash_time + time_flow;
-    if(wash_time>= max_water)   // water out warning 
+    if (P1IN & BIT1) {}
+    else
     {
-      wash_time=max_water;
-      for ( int i =0;i<=5;i++) 
+      P1OUT |= BIT0;
+      delay_(time_flow);  
+      P1OUT &= ~BIT0;
+      P1IFG &= ~BIT1;   // clear interrupt flag
+      
+      wash_time = wash_time + time_flow;
+      if(wash_time>= max_water)   // water out warning 
       {
-	P1OUT |= BIT6;
-	__delay_cycles(200000);
-	P1OUT &= ~BIT6;
-	__delay_cycles(200000);
-	
+        wash_time=max_water;
+        for ( int i =0;i<=5;i++) 
+        {
+          P1OUT |= BIT6;
+          __delay_cycles(200000);
+          P1OUT &= ~BIT6;
+          __delay_cycles(200000);
+          
+        }
+        
       }
+      display(wash_time,time_flow,cur_person); 
       
     }
-    display(wash_time,time_flow,cur_person); 
-      
   }
-    }
   else if (P1IFG &BIT2 ) //reduce spray time
   {	
     
@@ -172,6 +175,16 @@ __interrupt void Port_1(void)       // interrupt program
 	  __delay_cycles(1000000);
 	  P1OUT &= ~BIT6;
 	  cur_person ++;
+          if (cur_person>=max_person)
+          {
+              for ( int i =0;i<=5;i++) 
+              {
+                P1OUT |= BIT6;
+                __delay_cycles(200000);
+                P1OUT &= ~BIT6;
+                __delay_cycles(200000);
+               }
+          }
 	  break;
 	}
 	
@@ -187,7 +200,7 @@ __interrupt void Port_1(void)       // interrupt program
       
     }
   }
-
+  
   else if (P1IFG & BIT5 ) // detect people coming out
   { 
     __delay_cycles(50000);
@@ -217,20 +230,22 @@ __interrupt void Port_1(void)       // interrupt program
       display(wash_time,time_flow,cur_person);
     }
   }
-
-  else if (P1IFG &BIT7 )//reset wash_time
-  {
-    P1IFG &= ~BIT7;   
+  
+   else if (P1IFG &BIT7 ) //reduce spray time
+  {	
+    
+    P1IFG &= ~BIT7;  
     
     P1OUT |= BIT6;
-    __delay_cycles(10000);
+    __delay_cycles(100000);
     P1OUT &= ~BIT6;
     
-    wash_time =0;
-    display(wash_time,time_flow,cur_person); 
+    wash_time = 0;
+  
+    display(wash_time,time_flow,cur_person);
+    
   }
 }
-
 
 
 
