@@ -70,14 +70,14 @@ void main(void)
   P1IE  |= BIT3;             
   P1IES |= BIT3;         
   
-  /* P1.4 : Sensor door 1 */
+  /* P1.4 : Outside sensor 1 */
   P1DIR &=~BIT4; 	
   P1REN |= BIT4;   	 
   P1OUT &= ~BIT4; 	 
   P1IE  |= BIT4;  	  
   P1IES &= ~BIT4;  	 
   
-  /* P1.5 Sensor door 2 */
+  /* P1.5 inside sensor 2 */
   P1DIR &=~BIT5;         
   P1REN |= BIT5;         
   P1OUT &= ~BIT5;         
@@ -230,14 +230,3 @@ __interrupt void Port_1(void)       // interrupt program
     
   }
 }
-
-
-
-
-
-
-
-
-
-
-
