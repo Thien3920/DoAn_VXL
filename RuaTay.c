@@ -215,7 +215,7 @@ __interrupt void Port_1(void)       // interrupt program
     
   }
   
-   else if (P1IFG &BIT7 ) //reduce spray time
+   else if (P1IFG &BIT7 ) //Reset spray time
   {	
     
     P1IFG &= ~BIT7;  
