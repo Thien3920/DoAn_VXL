@@ -1,9 +1,9 @@
+
 //Dev: le Van Thien
 #include <msp430g2553.h>
 #include "lcd.c"
-
-volatile unsigned int  time_flow =1;
-volatile unsigned int  wash_time = 0;
+volatile unsigned int  time_flow  = 1;
+volatile unsigned int  wash_time  = 0;
 volatile unsigned int  cur_person = 0;
 
 int max_person =5;
@@ -41,29 +41,29 @@ void main(void)
   WDTCTL = WDTPW + WDTHOLD;  // Stop watchdog timer
   
   /* p1.0 output bump */ 
-  P1DIR = BIT0;     // P1.0 : output
-  P1OUT &= ~BIT0;   // P1.0 : off
+  P1DIR  = BIT0;     // P1.0 : output
+  P1OUT &=~BIT0;   // P1.0 : off
   
-  /* P1.6 Output for button p1.2 p1.3: Blink */
+  /* P1.6 Output for button p1.2; p1.3; water out warning; detect people in/out */
   P1DIR |= BIT6;
   P1OUT &=~BIT6;  
   
   
   /* P1.1 : proximity sensor */
-  P1DIR &= ~BIT1; 	 // p1.1 : input
-  P1REN |=BIT1;   	 // Pullup/pulldown resistor enabled
-  P1OUT |= BIT1; 	 // enable internal pull up
-  P1IE  |=BIT1;  	  // enable interrupt p1.1
-  P1IES |=BIT1;  	 //(high-to-low)
+  P1DIR &=~BIT1; 	 // p1.1 : input
+  P1REN |= BIT1;   	 // Pullup/pulldown resistor enabled
+  P1OUT |= BIT1; 	 // Pullup resistor enabled
+  P1IE  |= BIT1;  	 // enable interrupt p1.1
+  P1IES |= BIT1;  	 //(high-to-low)
   
-  /* P1.2 button up */
+  /* P1.2 button down */
   P1DIR &= ~BIT2;       
   P1REN |= BIT2;        
   P1OUT |= BIT2;         
   P1IE  |= BIT2;        
   P1IES |= BIT2;  	
   
-  /* P1.3 button down */
+  /* P1.3 button up */
   P1DIR &= ~BIT3;         
   P1REN |= BIT3;         
   P1OUT |= BIT3;         
@@ -71,25 +71,25 @@ void main(void)
   P1IES |= BIT3;         
   
   /* P1.4 : Sensor door 1 */
-  P1DIR &= ~BIT4; 	
-  P1REN |=BIT4;   	 
-  P1OUT |= BIT4; 	 
-  P1IE  |=BIT4;  	  
-  P1IES |=BIT4;  	 
+  P1DIR &=~BIT4; 	
+  P1REN |= BIT4;   	 
+  P1OUT &= ~BIT4; 	 
+  P1IE  |= BIT4;  	  
+  P1IES &= ~BIT4;  	 
   
   /* P1.5 Sensor door 2 */
-  P1DIR &= ~BIT5;         
+  P1DIR &=~BIT5;         
   P1REN |= BIT5;         
-  P1OUT |= BIT5;         
+  P1OUT &= ~BIT5;         
   P1IE  |= BIT5;             
-  P1IES |= BIT5; 
+  P1IES &= ~BIT5; 
 	
   /*P1.7 INPUT  FOR RESET WASH_TIME=0 (OUT OF WATER) */
-  P1DIR &= ~BIT7; 	
-  P1REN |=BIT7;   	
-  P1OUT |=BIT7; 	 
-  P1IE  |=BIT7;  	  
-  P1IES |=BIT7;  	 
+  P1DIR &=~BIT7; 	
+  P1REN |= BIT7;   	
+  P1OUT |= BIT7; 	 
+  P1IE  |= BIT7;  	  
+  P1IES |= BIT7;  	 
   
   /* LCD INIT */
   lcdInit();
@@ -105,16 +105,15 @@ void main(void)
 __interrupt void Port_1(void)       // interrupt program
 {
   
-  if (P1IFG & BIT1 )
-  {// hand wash sensor
+  if (P1IFG & BIT1 )		    // hand wash sensor
+  {
     __delay_cycles(50000);
-    if (P1IN & BIT1) {}
-    else
-    {
+    if ( (P1IN & BIT1) != BIT1) 
+    { 
       P1OUT |= BIT0;
       delay_(time_flow);  
       P1OUT &= ~BIT0;
-      P1IFG &= ~BIT1;   // clear interrupt flag
+      P1IFG &= ~BIT1;  		   // clear interrupt flag
       
       wash_time = wash_time + time_flow;
       if(wash_time>= max_water)   // water out warning 
@@ -134,9 +133,8 @@ __interrupt void Port_1(void)       // interrupt program
       
     }
   }
-  else if (P1IFG &BIT2 ) //reduce spray time
-  {	
-    
+  else if (P1IFG &BIT2 )         //reduce spray time
+  {	 
     P1IFG &= ~BIT2;  
     
     P1OUT |= BIT6;
@@ -150,8 +148,8 @@ __interrupt void Port_1(void)       // interrupt program
   }
   else if (P1IFG &BIT3 )// increase spray time
   {
-    
     P1IFG &= ~BIT3;   
+    
     P1OUT |= BIT6;
     __delay_cycles(100000);
     P1OUT &= ~BIT6;
@@ -162,15 +160,11 @@ __interrupt void Port_1(void)       // interrupt program
     
   }
   else if (P1IFG & BIT4 ) // detect people entering
-  { 
-    __delay_cycles(50000);
-    if (P1IN & BIT4) {
-      
-      
-      while(1)
-      {
-	if(P1IN &BIT5)
-	{
+  {     
+      while((P1IN & BIT4) == BIT4)
+      {		
+	 if( (P1IN & BIT5) == BIT5 )
+	 {
 	  
 	  P1OUT |= BIT6;
 	  __delay_cycles(1000000);
@@ -188,29 +182,22 @@ __interrupt void Port_1(void)       // interrupt program
           }
 	  break;
 	}
-	
-	if (P1IN & BIT4){}
-	else{
-	  break;
-	}
+	  
+		
       }
       P1IFG &= ~BIT5;   
       P1IFG &= ~BIT4;   
       
       display(wash_time,time_flow,cur_person);
       
-    }
+    
   }
   
   else if (P1IFG & BIT5 ) // detect people coming out
   { 
-    __delay_cycles(50000);
-    if (P1IN & BIT5) {
-      
-      
-      while(1)
+      while((P1IN & BIT5) == BIT5)
       {
-	if(P1IN &BIT4)
+	if ( (P1IN & BIT4) ==  BIT4)
 	{
 	  
 	  P1OUT |= BIT6;
@@ -219,17 +206,13 @@ __interrupt void Port_1(void)       // interrupt program
 	  cur_person --;
 	  break;
 	}
-	
-	if (P1IN & BIT5){}
-	else{
-	  break;
-	}
+
       }
       P1IFG &= ~BIT5;   
       P1IFG &= ~BIT4;   
       
       display(wash_time,time_flow,cur_person);
-    }
+    
   }
   
    else if (P1IFG &BIT7 ) //reduce spray time
@@ -247,6 +230,11 @@ __interrupt void Port_1(void)       // interrupt program
     
   }
 }
+
+
+
+
+
 
 
 
