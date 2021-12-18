@@ -53,12 +53,12 @@ void main(void)
   P1REN |=BIT7;   	 // Pullup/pulldown resistor enabled
   P1OUT &= ~BIT7; 	 // enable internal pull down
   P1IE  |=BIT7;  	  // enable interrupt p1.1
-  P1IES &=~BIT7;  	 //(low-to-high)  
+  P1IES |=BIT7;  	 //(high-to-low)  
   
   /* P1.1 : proximity sensor */
   P1DIR &= ~BIT1; 	 // p1.1 : input
   P1REN |=BIT1;   	 // Pullup/pulldown resistor enabled
-  P1OUT &= ~BIT1; 	 // enable internal pull down
+  P1OUT |= BIT1; 	 // enable internal pull up
   P1IE  |=BIT1;  	  // enable interrupt p1.1
   P1IES &=~BIT1;  	 //(low-to-high)
   
