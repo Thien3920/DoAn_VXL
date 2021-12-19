@@ -4,11 +4,4 @@
 - Điều chỉnh lưu lượng nước mỗi lần bơm bằng nút nhấn  
 - Cảm biến người đi vào - ra khỏi phòng -> đếm số lượng người trong phòng và đưa ra mức cảnh báo  
 ##  Conection  
-### LCD:  
-- RS - P2.5  
-- RW - GND  
-- E - P2.4  
-- D4 - P2.0  
-- D5 - P2.1  
-- D6 - P2.2  
-- D7 - P2.3  
+![image](https://user-images.githubusercontent.com/79197775/146675366-77257782-6288-4b7e-ac0e-62aff846eb77.png)
