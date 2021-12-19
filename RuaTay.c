@@ -124,16 +124,13 @@ __interrupt void Port_1(void)       // interrupt program
           P1OUT |= BIT6;
           __delay_cycles(200000);
           P1OUT &= ~BIT6;
-          __delay_cycles(200000);
-          
-        }
-        
+          __delay_cycles(200000); 
+        }    
       }
       display(wash_time,time_flow,cur_person); 
-      
     }
   }
-  else if (P1IFG &BIT2 )         //reduce spray time
+  else if (P1IFG &BIT2 )         //decrease spray time
   {	 
     P1IFG &= ~BIT2;  
     
@@ -181,18 +178,13 @@ __interrupt void Port_1(void)       // interrupt program
                }
           }
 	  break;
-	}
-	  
-		
+	}	
       }
       P1IFG &= ~BIT5;   
       P1IFG &= ~BIT4;   
       
-      display(wash_time,time_flow,cur_person);
-      
-    
+      display(wash_time,time_flow,cur_person);   
   }
-  
   else if (P1IFG & BIT5 ) // detect people coming out
   { 
       while((P1IN & BIT5) == BIT5)
@@ -211,11 +203,10 @@ __interrupt void Port_1(void)       // interrupt program
       P1IFG &= ~BIT5;   
       P1IFG &= ~BIT4;   
       
-      display(wash_time,time_flow,cur_person);
-    
+      display(wash_time,time_flow,cur_person);   
   }
   
-   else if (P1IFG &BIT7 ) //Reset spray time
+   else if (P1IFG &BIT7 ) //Reset water level
   {	
     
     P1IFG &= ~BIT7;  
